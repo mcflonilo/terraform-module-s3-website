@@ -1,6 +1,13 @@
 resource "aws_s3_bucket" "bucket" {
   bucket = var.bucket_name
 }
+resource "aws_s3_bucket_object" "typescript_files" {
+  for_each = fileset(path.module, "src/*.ts")
+  bucket   = aws_s3_bucket.bucket.bucket
+  key      = each.value
+  source   = "${path.module}/${each.value}"
+  content_type = "application/javascript"
+}
 
 resource "aws_s3_bucket_policy" "bucket_policy" {
   depends_on = [aws_s3_bucket_public_access_block.example]
